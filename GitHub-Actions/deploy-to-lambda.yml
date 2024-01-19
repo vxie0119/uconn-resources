@@ -1,6 +1,6 @@
 # This yaml only pushes the code to the existing lambda. You must create
 #  the lambda function(s) in the AWS Console first, before triggering the pipeline. 
-# Source:  https://www.whitespectre.com/ideas/multiple-aws-lambda-deployment-with-github-actions/
+# Source:  https://www.whitespectre.com/ideas/multiple-aws-lambda-deployment-with-github-actions/ 
 on:
   push:
     branches:
