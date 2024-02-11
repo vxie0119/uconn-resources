@@ -1,0 +1,16 @@
+aws dynamodb list-tables
+aws dynamodb scan --table-name demo-dynamodb-jon
+aws dynamodb query --table-name demo-dynamodb-jon --key-condition-expression "grad_year = :v1" --expression-attribute-values "{ \":v1\" : { \"N\" : \"2024\" }}"
+aws dynamodb query \
+    --table-name demo-dynamodb-jon \
+    --index-name favorite_prof-index  \
+    --key-condition-expression "favorite_prof = :name" \
+    --expression-attribute-values  '{":name":{"S":"clark"}}'
+aws dynamodb put-item \
+    --table-name demo-dynamodb-jon \
+    --item '{
+        "grad_year": {"N": "2024"},
+        "student_id": {"S": "QWE55555"} ,
+        "favorite_prof": {"S": "clark"} 
+      }' \
+    --return-consumed-capacity TOTAL
