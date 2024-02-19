@@ -1,0 +1,4 @@
+{
+    "bucket": "$input.params('bucket')",
+    "file_name": "$input.params('file_name')"
+}
