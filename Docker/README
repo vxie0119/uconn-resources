@@ -1,0 +1,42 @@
+# Build the container
+docker build -t class-demo2 .
+# List the images on the local machine
+docker images
+# Run the container locally (For the ports - host_port:container_port)
+docker run -d -p 5001:5000 class-demo2
+# List the locally running containers. (Add the -a switch to see stopped containers.)
+docker ps
+# Test accessing the local container. (You can also use a browser.)
+curl localhost:5000
+
+# Show the layer history
+docker history class-demo
+
+# Access the running container using the Bash shell
+docker exec -it <CONTAINER-ID> bash
+# Access the running container using the Bourne shell
+docker exec -it <CONTAINER-ID> sh
+
+# Check the container logs
+docker logs <CONTAINER-ID>
+# Check the port mappings for the container
+docker port <CONTAINER-ID>
+# Check the container config
+docker inspect <CONTAINER-ID>
+# View memory/cpu etc...
+docker stats
+
+############################
+# CLEAN UP
+
+# Stop the container
+docker stop <CONTAINER-ID>
+# Remove an image
+docker image rm -f <IMAGE-ID>
+# Remove all stopped containers
+docker container prune
+# Remove all dangling images (not tagged, not associated with a container)
+docker image prune
+# Remove all containers, images, ... that are not being used
+docker system prune
+
