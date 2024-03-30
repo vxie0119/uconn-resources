@@ -1,0 +1,57 @@
+# Based on https://docs.aws.amazon.com/lambda/latest/dg/with-s3-tutorial.html
+
+# This yaml only pushes the code to the existing lambda. You must create
+#  the lambda function(s) in the AWS Console first, before triggering the pipeline. 
+# Source:  https://www.whitespectre.com/ideas/multiple-aws-lambda-deployment-with-github-actions/
+on:
+  push:
+    branches:
+      - hw09
+jobs:
+  deploy1:
+    name: Deploy lambdas 
+    # Your repo MUST be in a UConn GitHub Organization that has been configured with RH Runners. 
+    # This is a manual task that needs to be completed by the UConn School of Business IT staff.
+    # The runs-on value must be "self-hosted" to leverage the runner .
+    runs-on: self-hosted
+    strategy:
+      matrix:
+        #python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
+        python-version: ["3.9"]
+
+    steps:
+      - name: Checkout the files
+        uses: actions/checkout@v2
+          
+      # Setp AWS CLI
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: us-east-1
+
+      # Assumes some things are named certain values. If you have different names, just update them below 
+      # Lambda function name in AWS: hw09-db-metadata-writer
+      # AWS Lambda runtime settings for Handler:  lambda_db_writer.lambda_handler
+      - name: Zip python code - DB Metadata lambda function
+        run: zip -j hw09-db-writer.zip ./HW09/lambda_db_writer.py
+      - name: Deploy DB Metadata Lambda
+        run: aws lambda update-function-code --function-name=hw09-db-metadata-writer --zip-file=fileb://hw09-db-writer.zip
+
+      # Create a Lambda Deployment Package containing the needed modules and the python function
+      # Assumes some things are named certain values. If you have different names, just update them below 
+      # Lambda function name in AWS: hw09-thumbnail-generation
+      # AWS Lambda runtime settings for Handler:  lambda_thumbnail_generator.lambda_handler
+      # Python version used by your AWS lambda:  3.9   (and NOT 3.12)
+      - name: Zip python code - Thumbnail Generator Lambda function
+        run: |
+          mkdir lambda_thumbnail
+          pip install --platform manylinux2014_x86_64 --target=lambda_thumbnail --implementation cp --python-version 3.9 --only-binary=:all: --upgrade pillow
+          cd lambda_thumbnail
+          zip -r ../hw09-thumbnail-generator.zip .
+          cd ../HW09
+          zip ../hw09-thumbnail-generator.zip lambda_thumbnail_generator.py
+      - name: Deploy Thumbnail Lambda
+        run: aws lambda update-function-code --function-name=hw09-thumbnail-generation --zip-file=fileb://hw09-thumbnail-generator.zip
